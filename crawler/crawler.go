@@ -59,6 +59,9 @@ func (crawler *Crawler) ConvertReleaseTime(value string, bankID int) time.Time {
 	if value != "" {
 
 		value = strings.ReplaceAll(value, ".", "-")
+		value = strings.ReplaceAll(value, "年", "-")
+		value = strings.ReplaceAll(value, "月", "-")
+		value = strings.ReplaceAll(value, "日", "")
 		value = strings.ReplaceAll(value, " ", "T")
 		value = value + BankTimeZoneMap[bankID]
 		releaseTime, err := time.Parse(time.RFC3339, value)

@@ -22,6 +22,7 @@ func main() {
 			fmt.Println("Get exchange rate")
 			go banks.BankOfChina()
 			go banks.ChinaMerchantsBank()
+			go banks.IndustrialAndCommercialBankOfChina()
 		}
 	}
 }
