@@ -35,7 +35,7 @@ func BankOfChina() {
 
 	if bankOfChinaExchangeRateMap == nil {
 
-		erMap, err := bankOfChinaCrawler.InitExchangeRateInfoMap("b_bankofchina")
+		erMap, err := bankOfChinaCrawler.InitExchangeRateInfoMap("b_china_boc")
 
 		if err != nil {
 			fmt.Printf("Init exchange rate info map failed. %v\n", err.Error())
@@ -77,7 +77,7 @@ func BankOfChina() {
 
 			if len(bankOfChinaExchangeRateMap) == 0 {
 
-				bankOfChinaCrawler.SaveEachBankExchangeRate(rateInfo, "b_bankofchina")
+				bankOfChinaCrawler.SaveEachBankExchangeRate(rateInfo, "b_china_boc")
 				bankOfChinaExchangeRateMap[rateInfo.CurrencyID] = rateInfo
 
 			} else {
@@ -90,7 +90,7 @@ func BankOfChina() {
 
 						if isChanged(pre, rateInfo) {
 
-							bankOfChinaCrawler.SaveEachBankExchangeRate(rateInfo, "b_bankofchina")
+							bankOfChinaCrawler.SaveEachBankExchangeRate(rateInfo, "b_china_boc")
 							bankOfChinaExchangeRateMap[rateInfo.CurrencyID] = rateInfo
 
 							fmt.Println("Bank of China Data changed.")
@@ -102,7 +102,7 @@ func BankOfChina() {
 
 					} else {
 
-						bankOfChinaCrawler.SaveEachBankExchangeRate(rateInfo, "b_bankofchina")
+						bankOfChinaCrawler.SaveEachBankExchangeRate(rateInfo, "b_china_boc")
 						bankOfChinaExchangeRateMap[rateInfo.CurrencyID] = rateInfo
 					}
 				}
