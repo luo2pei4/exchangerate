@@ -11,13 +11,13 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-var chinaMerchantsBankCrawler *crawler.Crawler
-var chinaMerchantsBankExchangeRateMap map[int]*dto.ExchangeRateInfo
+var cmbCrawler *crawler.Crawler
+var cmbExchangeRateMap map[int]*dto.ExchangeRateInfo
 
 // ChinaMerchantsBank 爬取数据
 func ChinaMerchantsBank() {
 
-	if chinaMerchantsBankCrawler == nil {
+	if cmbCrawler == nil {
 
 		c, err := crawler.NewInstance()
 
@@ -26,29 +26,29 @@ func ChinaMerchantsBank() {
 			return
 		}
 
-		chinaMerchantsBankCrawler = c
+		cmbCrawler = c
 	}
 
-	doc := chinaMerchantsBankCrawler.GetPageDoc("http://fx.cmbchina.com/hq/")
+	doc := cmbCrawler.GetPageDoc("http://fx.cmbchina.com/hq/")
 
 	if doc == nil {
 		return
 	}
 
-	if chinaMerchantsBankExchangeRateMap == nil {
+	if cmbExchangeRateMap == nil {
 
-		erMap, err := chinaMerchantsBankCrawler.InitExchangeRateInfoMap("b_china_cmb")
+		erMap, err := cmbCrawler.InitExchangeRateInfoMap("b_china_cmb")
 
 		if err != nil {
 			fmt.Println("Init exchange rate info map failed.")
 			return
 		}
 
-		chinaMerchantsBankExchangeRateMap = erMap
+		cmbExchangeRateMap = erMap
 	}
 
 	// 因为招商银行的发布时间没有带日期，所以这个地方需要按时区来获取日期
-	date := chinaMerchantsBankCrawler.GetDateByTimezone("Asia/Shanghai")
+	date := cmbCrawler.GetDateByTimezone("Asia/Shanghai")
 
 	doc.Find("#realRateInfo > table > tbody").Each(func(i int, table *goquery.Selection) {
 
@@ -77,27 +77,27 @@ func ChinaMerchantsBank() {
 					rateInfo.CashBuyingRate, _ = strconv.ParseFloat(value, 64)
 				case 7:
 					value = date + "T" + value
-					rateInfo.ReleaseTime = chinaMerchantsBankCrawler.ConvertReleaseTime(value, 2) // 招商银行的银行ID为2
+					rateInfo.ReleaseTime = cmbCrawler.ConvertReleaseTime(value, 2) // 招商银行的银行ID为2
 				}
 			})
 
-			if len(chinaMerchantsBankExchangeRateMap) == 0 {
+			if len(cmbExchangeRateMap) == 0 {
 
-				chinaMerchantsBankCrawler.SaveEachBankExchangeRate(rateInfo, "b_china_cmb")
-				chinaMerchantsBankExchangeRateMap[rateInfo.CurrencyID] = rateInfo
+				cmbCrawler.SaveEachBankExchangeRate(rateInfo, "b_china_cmb")
+				cmbExchangeRateMap[rateInfo.CurrencyID] = rateInfo
 
 			} else {
 
 				if rateInfo.CurrencyID != 0 {
 
-					pre := chinaMerchantsBankExchangeRateMap[rateInfo.CurrencyID]
+					pre := cmbExchangeRateMap[rateInfo.CurrencyID]
 
 					if pre != nil {
 
 						if isChanged(pre, rateInfo) {
 
-							chinaMerchantsBankCrawler.SaveEachBankExchangeRate(rateInfo, "b_china_cmb")
-							chinaMerchantsBankExchangeRateMap[rateInfo.CurrencyID] = rateInfo
+							cmbCrawler.SaveEachBankExchangeRate(rateInfo, "b_china_cmb")
+							cmbExchangeRateMap[rateInfo.CurrencyID] = rateInfo
 
 							fmt.Println("China Merchants Bank Data changed.")
 
@@ -109,8 +109,8 @@ func ChinaMerchantsBank() {
 
 					} else {
 
-						chinaMerchantsBankCrawler.SaveEachBankExchangeRate(rateInfo, "b_china_cmb")
-						chinaMerchantsBankExchangeRateMap[rateInfo.CurrencyID] = rateInfo
+						cmbCrawler.SaveEachBankExchangeRate(rateInfo, "b_china_cmb")
+						cmbExchangeRateMap[rateInfo.CurrencyID] = rateInfo
 					}
 				}
 			}

@@ -10,13 +10,13 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-var bankOfChinaCrawler *crawler.Crawler
-var bankOfChinaExchangeRateMap map[int]*dto.ExchangeRateInfo
+var bocCrawler *crawler.Crawler
+var bocExchangeRateMap map[int]*dto.ExchangeRateInfo
 
 // BankOfChina 爬取数据
 func BankOfChina() {
 
-	if bankOfChinaCrawler == nil {
+	if bocCrawler == nil {
 
 		c, err := crawler.NewInstance()
 
@@ -25,25 +25,25 @@ func BankOfChina() {
 			return
 		}
 
-		bankOfChinaCrawler = c
+		bocCrawler = c
 	}
 
-	doc := bankOfChinaCrawler.GetPageDoc("https://www.boc.cn/sourcedb/whpj/index.html")
+	doc := bocCrawler.GetPageDoc("https://www.boc.cn/sourcedb/whpj/index.html")
 
 	if doc == nil {
 		return
 	}
 
-	if bankOfChinaExchangeRateMap == nil {
+	if bocExchangeRateMap == nil {
 
-		erMap, err := bankOfChinaCrawler.InitExchangeRateInfoMap("b_china_boc")
+		erMap, err := bocCrawler.InitExchangeRateInfoMap("b_china_boc")
 
 		if err != nil {
 			fmt.Printf("Init exchange rate info map failed. %v\n", err.Error())
 			return
 		}
 
-		bankOfChinaExchangeRateMap = erMap
+		bocExchangeRateMap = erMap
 	}
 
 	doc.Find("body > div > div.BOC_main > div.publish > div:nth-child(3) > table > tbody").Each(func(i int, table *goquery.Selection) {
@@ -72,27 +72,27 @@ func BankOfChina() {
 				case 5:
 					rateInfo.MiddleRate, _ = strconv.ParseFloat(value, 64)
 				case 6:
-					rateInfo.ReleaseTime = bankOfChinaCrawler.ConvertReleaseTime(value, 1) // 中国银行的银行ID为1
+					rateInfo.ReleaseTime = bocCrawler.ConvertReleaseTime(value, 1) // 中国银行的银行ID为1
 				}
 			})
 
-			if len(bankOfChinaExchangeRateMap) == 0 {
+			if len(bocExchangeRateMap) == 0 {
 
-				bankOfChinaCrawler.SaveEachBankExchangeRate(rateInfo, "b_china_boc")
-				bankOfChinaExchangeRateMap[rateInfo.CurrencyID] = rateInfo
+				bocCrawler.SaveEachBankExchangeRate(rateInfo, "b_china_boc")
+				bocExchangeRateMap[rateInfo.CurrencyID] = rateInfo
 
 			} else {
 
 				if rateInfo.CurrencyID != 0 {
 
-					pre := bankOfChinaExchangeRateMap[rateInfo.CurrencyID]
+					pre := bocExchangeRateMap[rateInfo.CurrencyID]
 
 					if pre != nil {
 
 						if isChanged(pre, rateInfo) {
 
-							bankOfChinaCrawler.SaveEachBankExchangeRate(rateInfo, "b_china_boc")
-							bankOfChinaExchangeRateMap[rateInfo.CurrencyID] = rateInfo
+							bocCrawler.SaveEachBankExchangeRate(rateInfo, "b_china_boc")
+							bocExchangeRateMap[rateInfo.CurrencyID] = rateInfo
 
 							fmt.Println("Bank of China Data changed.")
 						} else {
@@ -103,8 +103,8 @@ func BankOfChina() {
 
 					} else {
 
-						bankOfChinaCrawler.SaveEachBankExchangeRate(rateInfo, "b_china_boc")
-						bankOfChinaExchangeRateMap[rateInfo.CurrencyID] = rateInfo
+						bocCrawler.SaveEachBankExchangeRate(rateInfo, "b_china_boc")
+						bocExchangeRateMap[rateInfo.CurrencyID] = rateInfo
 					}
 				}
 			}
