@@ -81,8 +81,6 @@ func IndustrialAndCommercialBankOfChina() {
 				}
 			})
 
-			fmt.Println(rateInfo)
-
 			if len(icbcExchangeRateMap) == 0 {
 
 				icbcCrawler.SaveEachBankExchangeRate(rateInfo, "b_china_icbc")
