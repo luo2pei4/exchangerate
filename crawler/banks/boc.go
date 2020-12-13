@@ -1,3 +1,4 @@
+// Package banks 中国银行
 package banks
 
 import (
