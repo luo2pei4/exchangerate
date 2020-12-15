@@ -123,6 +123,7 @@ func (c *Connection) InsertExchangeRateData(table string, info *dto.ExchangeRate
 
 	sql := fmt.Sprintf("INSERT INTO %v(currencyid, buying_rate, cash_buying_rate, selling_rate, cash_selling_rate, middle_rate, benchmark, central_parity_rate, reference_rate, release_time) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", table)
 	ins, err := c.conn.Prepare(sql)
+	defer ins.Close()
 
 	if err != nil {
 		return 0, 0, err
