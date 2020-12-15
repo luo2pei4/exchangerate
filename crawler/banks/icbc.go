@@ -99,7 +99,7 @@ func IndustrialAndCommercialBankOfChina() {
 							icbcCrawler.SaveEachBankExchangeRate(rateInfo, "b_china_icbc")
 							icbcExchangeRateMap[rateInfo.CurrencyID] = rateInfo
 
-							fmt.Println("China Merchants Bank Data changed.")
+							fmt.Println("Industrial And Commercial Bank Of China Data changed.")
 
 						} else {
 
